@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows XP ROFL EDITION</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: Tahoma, sans-serif;
+  background: #3a6ea5; color: #111;
+}
+header {
+  background: linear-gradient(#1686ed, #0054b8);
+  color: white; padding: 18px; text-align: center;
+  border-bottom: 3px solid #ffcc33;
+}
+.window {
+  max-width: 650px; margin: 35px auto;
+  background: #ece9d8; border: 3px solid #0054b8;
+  border-radius: 8px 8px 0 0; box-shadow: 5px 7px #16365c;
+}
+.title {
+  background: linear-gradient(90deg, #0058d7, #55aaff);
+  color: white; padding: 10px; font-weight: bold;
+}
+main { padding: 22px; text-align: center; }
+button {
+  background: linear-gradient(white, #d5e7fa);
+  border: 2px solid #4b79a8; border-radius: 4px;
+  padding: 11px 16px; margin: 6px; cursor: pointer;
+  font-weight: bold; font-size: 15px;
+}
+button:hover { background: #fff1a8; }
+#message {
+  margin: 18px 0; padding: 15px;
+  background: white; border: 2px inset #aaa; min-height: 55px;
+}
+.taskbar {
+  position: fixed; bottom: 0; width: 100%;
+  background: linear-gradient(#2588ee, #0753ad);
+  color: white; padding: 10px;
+}
+.start { background: #35a535; border-radius: 0 15px 15px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🖥️ Windows XP ROFL EDITION</h1>
+  <p>Самая несерьёзная операционная система</p>
+</header>
+
+<div class="window">
+  <div class="title">💾 BRO.exe — Центр приколов</div>
+  <main>
+    <h2>Добро пожаловать, бро! 😎</h2>
+    <p>Выбери свою судьбу:</p>
+
+    <button onclick="joke()">💀 Прикол дня</button>
+    <button onclick="fakeError()">⚠️ Ошибка XP</button>
+    <button onclick="secret()">🔒 Секретная кнопка</button>
+
+    <div id="message">Система готова. Ждём действий пользователя...</div>
+  </main>
+</div>
+
+<div class="taskbar">
+  🟢 Пуск &nbsp; | &nbsp; BRO.exe работает
+</div>
+
+<script>
+const messages = [
+  "БРО, твой компьютер слишком крутой для этой реальности 💀",
+  "Windows XP обнаружила отсутствие печенек 🍪",
+  "Ошибка 404: домашка не найдена 😂",
+  "Система стабильна. Это подозрительно 🤨",
+  "Крипер пришёл проверить твой рабочий стол 💚"
+];
+
+function joke() {
+  document.getElementById("message").textContent =
+    messages[Math.floor(Math.random() * messages.length)];
+}
+
+function fakeError() {
+  document.getElementById("message").textContent =
+    "⚠️ КРИТИЧЕСКАЯ ОШИБКА: слишком много крутости! Перезапуск не требуется 😎";
+}
+
+function secret() {
+  document.getElementById("message").textContent =
+    "🎉 СЕКРЕТ НАЙДЕН! Ты теперь почётный админ ROFL EDITION!";
+}
+</script>
+</body>
+</html>
