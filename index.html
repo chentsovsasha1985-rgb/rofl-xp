@@ -8,41 +8,71 @@
 <style>
 * { box-sizing: border-box; }
 body {
-  margin: 0; font-family: Tahoma, sans-serif;
-  background: #3a6ea5; color: #111;
+  margin: 0;
+  padding-bottom: 65px;
+  font-family: Tahoma, sans-serif;
+  background: #3a6ea5;
+  color: #111;
 }
 header {
   background: linear-gradient(#1686ed, #0054b8);
-  color: white; padding: 18px; text-align: center;
+  color: white;
+  padding: 18px;
+  text-align: center;
   border-bottom: 3px solid #ffcc33;
 }
 .window {
-  max-width: 650px; margin: 35px auto;
-  background: #ece9d8; border: 3px solid #0054b8;
-  border-radius: 8px 8px 0 0; box-shadow: 5px 7px #16365c;
+  max-width: 650px;
+  margin: 35px auto;
+  background: #ece9d8;
+  border: 3px solid #0054b8;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 5px 7px #16365c;
 }
 .title {
   background: linear-gradient(90deg, #0058d7, #55aaff);
-  color: white; padding: 10px; font-weight: bold;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
 }
 main { padding: 22px; text-align: center; }
 button {
   background: linear-gradient(white, #d5e7fa);
-  border: 2px solid #4b79a8; border-radius: 4px;
-  padding: 11px 16px; margin: 6px; cursor: pointer;
-  font-weight: bold; font-size: 15px;
+  border: 2px solid #4b79a8;
+  border-radius: 4px;
+  padding: 11px 16px;
+  margin: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
 }
 button:hover { background: #fff1a8; }
 #message {
-  margin: 18px 0; padding: 15px;
-  background: white; border: 2px inset #aaa; min-height: 55px;
+  margin: 18px 0;
+  padding: 15px;
+  background: white;
+  border: 2px inset #aaa;
+  min-height: 55px;
+}
+#videoBox {
+  display: none;
+  margin-top: 18px;
+}
+video {
+  display: block;
+  width: 100%;
+  max-height: 400px;
+  background: black;
+  border: 3px solid #0054b8;
 }
 .taskbar {
-  position: fixed; bottom: 0; width: 100%;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   background: linear-gradient(#2588ee, #0753ad);
-  color: white; padding: 10px;
+  color: white;
+  padding: 10px;
 }
-.start { background: #35a535; border-radius: 0 15px 15px 0; }
 </style>
 </head>
 <body>
@@ -60,8 +90,17 @@ button:hover { background: #fff1a8; }
     <button onclick="joke()">💀 Прикол дня</button>
     <button onclick="fakeError()">⚠️ Ошибка XP</button>
     <button onclick="secret()">🔒 Секретная кнопка</button>
+    <button onclick="toggleVideo()">💀 далнабоешик</button>
 
     <div id="message">Система готова. Ждём действий пользователя...</div>
+
+    <div id="videoBox">
+      <h3>💀 ROFL VIDEO 💀</h3>
+      <video id="roflVideo" controls preload="metadata">
+        <source src="rofl.mp4" type="video/mp4">
+        Твой браузер не поддерживает видео.
+      </video>
+    </div>
   </main>
 </div>
 
@@ -91,6 +130,24 @@ function fakeError() {
 function secret() {
   document.getElementById("message").textContent =
     "🎉 СЕКРЕТ НАЙДЕН! Ты теперь почётный админ ROFL EDITION!";
+}
+
+function toggleVideo() {
+  const box = document.getElementById("videoBox");
+  const video = document.getElementById("roflVideo");
+
+  if (box.style.display === "block") {
+    video.pause();
+    video.currentTime = 0;
+    box.style.display = "none";
+  } else {
+    box.style.display = "block";
+    video.play().catch(() => {
+      document.getElementById("message").textContent =
+        "Нажми ▶️ на самом видео, чтобы начать воспроизведение.";
+    });
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
 }
 </script>
 </body>
