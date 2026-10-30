@@ -161,6 +161,127 @@ function toggleVideo() {
   );
 
   console.log("KuKirin Life Online: Supabase подключён!");
-</script>Ы
+</script>
+  <style>
+  #kukirin-game {
+    display: none;
+    min-height: 650px;
+    padding: 24px;
+    color: white;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(#101c35, #142d36);
+    border-radius: 18px;
+    text-align: center;
+  }
+  #kukirin-game h1 { color: #65f5bd; }
+  .kg-stats {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 20px 0;
+  }
+  .kg-stat, .kg-panel {
+    background: #203b4b;
+    border: 1px solid #3b6870;
+    border-radius: 14px;
+    padding: 16px;
+  }
+  .kg-stat { min-width: 100px; }
+  #kg-city {
+    margin: 20px auto;
+    max-width: 650px;
+    padding: 55px 10px;
+    border-radius: 16px;
+    background: linear-gradient(#477d91 0 55%, #344d43 55%);
+    font-size: 64px;
+  }
+  #kg-scooter { display: inline-block; transition: transform .15s; }
+  .kg-button {
+    border: 0;
+    border-radius: 10px;
+    padding: 13px 20px;
+    margin: 6px;
+    background: #65f5bd;
+    color: #102b2a;
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>
+
+<section id="kukirin-game">
+  <h1>🛴 KuKirin Life Online</h1>
+  <p>Добро пожаловать в город!</p>
+
+  <div class="kg-stats">
+    <div class="kg-stat">⚡ Скорость<br><b id="kg-speed">0</b> км/ч</div>
+    <div class="kg-stat">🪙 Монеты<br><b id="kg-coins">100</b></div>
+    <div class="kg-stat">🔋 Батарея<br><b>100%</b></div>
+  </div>
+
+  <div id="kg-city">
+    <div id="kg-scooter">🛴</div>
+    <div style="font-size:18px">KUКIRIN CITY</div>
+  </div>
+
+  <div class="kg-panel">
+    <h2>Управление</h2>
+    <button class="kg-button" id="kg-go">ГАЗ ▲</button>
+    <button class="kg-button" id="kg-stop">ТОРМОЗ ▼</button>
+    <button class="kg-button" id="kg-earn">Найти монеты 🪙</button>
+    <p>Можно также использовать стрелки ↑ и ↓ на клавиатуре.</p>
+  </div>
+
+  <button class="kg-button" id="kg-exit">Вернуться на главный сайт</button>
+</section>
+
+<script>
+(() => {
+  const game = document.getElementById("kukirin-game");
+  const speedText = document.getElementById("kg-speed");
+  const scooter = document.getElementById("kg-scooter");
+  let speed = 0;
+  let coins = 100;
+  let position = 0;
+
+  function update() {
+    speedText.textContent = speed;
+    scooter.style.transform = `translateX(${position}px)`;
+  }
+
+  document.getElementById("kg-go").onclick = () => {
+    speed = Math.min(45, speed + 5);
+    position = Math.min(220, position + 18);
+    update();
+  };
+
+  document.getElementById("kg-stop").onclick = () => {
+    speed = Math.max(0, speed - 10);
+    update();
+  };
+
+  document.getElementById("kg-earn").onclick = () => {
+    coins += 10;
+    document.getElementById("kg-coins").textContent = coins;
+  };
+
+  document.getElementById("kg-exit").onclick = () => {
+    game.style.display = "none";
+  };
+
+  document.addEventListener("keydown", (event) => {
+    if (game.style.display === "none") return;
+    if (event.key === "ArrowUp") document.getElementById("kg-go").click();
+    if (event.key === "ArrowDown") document.getElementById("kg-stop").click();
+  });
+
+  // Временный запуск демоверсии клавишей G
+  document.addEventListener("keydown", (event) => {
+    if (event.key.toLowerCase() === "g") {
+      game.style.display = "block";
+    }
+  });
+})();
+</script>
 </body>
 </html>
