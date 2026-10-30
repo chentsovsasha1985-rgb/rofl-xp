@@ -150,5 +150,17 @@ function toggleVideo() {
   }
 }
 </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://xfqmzfptxqndtikuxrjo.supabase.co/rest/v1/";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmcW16ZnB0eHFuZHRpa3V4cmpvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjkxNDUsImV4cCI6MjEwODk0NTE0NX0._SjQvVD6qKIk2Qaa_fRr02rdYdgsm-gU47lNrcCJdsY";
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+  console.log("KuKirin Life Online: Supabase подключён!");
+</script>Ы
 </body>
 </html>
