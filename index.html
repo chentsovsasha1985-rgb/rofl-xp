@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KuKirin Life — Map V2 Fixed</title>
+<style>
+html,body{margin:0;height:100%;overflow:hidden;background:#9fb6c9;font-family:Arial,sans-serif}
+#hud{position:fixed;z-index:4;left:16px;top:16px;color:#fff;background:#0b121dcc;padding:12px 15px;border-radius:12px}
+#hud b{font-size:18px}#hud small{display:block;margin-top:5px;opacity:.8}
+#hint{position:fixed;z-index:4;right:16px;bottom:16px;color:#fff;background:#0b121dcc;padding:10px 13px;border-radius:10px}
+canvas{display:block}
+</style>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}</script>
+</head>
+<body>
+<div id="hud"><b>🛴 KuKirin Life</b><small>Большая городская карта — V2</small><small>WASD — езда • мышь — камера • колесо — приближение</small></div>
+<div id="hint">🏪 Dealer · 🔧 Tuning · 🟠 Rideout / Event</div>
+<script type="module">
+import * as THREE from 'three';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x9fb6c9);
+scene.fog = new THREE.Fog(0x9fb6c9, 150, 520);
+
+const camera = new THREE.PerspectiveCamera(65, innerWidth / innerHeight, .1, 900);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.7));
+renderer.shadowMap.enabled = true;
+document.body.appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xe9f3ff, 0x536348, 2));
+const sun = new THREE.DirectionalLight(0xffefc5, 2.8);
+sun.position.set(-120, 180, 90);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+scene.add(sun);
+
+const M = x => new THREE.MeshStandardMaterial({ color: x, roughness: .88 });
+const roadMat = M(0x292d31), side = M(0x777c80), grass = M(0x526b4b);
+const white = M(0xe8e5d6), dark = M(0x20262c), glass = M(0x8db4c5);
+
+function mesh(geometry, material, x, y, z, shadow = true) {
+  const q = new THREE.Mesh(geometry, material);
+  q.position.set(x, y, z);
+  q.castShadow = shadow;
+  q.receiveShadow = true;
+  scene.add(q);
+  return q;
+}
+function box(x, y, z, w, h, d, material) {
+  return mesh(new THREE.BoxGeometry(w, h, d), material, x, y, z);
+}
+function plane(x, z, w, d, material) {
+  const q = new THREE.Mesh(new THREE.PlaneGeometry(w, d), material);
+  q.rotation.x = -Math.PI / 2;
+  q.position.set(x, .03, z);
+  q.receiveShadow = true;
+  scene.add(q);
+}
+plane(0, 0, 560, 560, grass);
+
+function makeRoad(x, z, w, d) {
+  plane(x, z, w, d, roadMat);
+  const horizontal = w > d;
+  const length = horizontal ? w : d;
+  for (let p = -length / 2 + 10; p < length / 2 - 8; p += 18) {
+    plane(horizontal ? x + p : x, horizontal ? z : z + p,
+      horizontal ? 6 : .3, horizontal ? .3 : 6, white);
+  }
+}
+makeRoad(0, 0, 34, 520);
+makeRoad(0, 0, 520, 34);
+makeRoad(-92, 0, 18, 520);
+makeRoad(92, 0, 18, 520);
+makeRoad(0, -92, 520, 18);
+makeRoad(0, 92, 520, 18);
+makeRoad(-150, -150, 14, 260);
+makeRoad(150, 150, 14, 260);
+makeRoad(-150, 150, 260, 14);
+makeRoad(150, -150, 260, 14);
+
+for (const x of [-22, 22, -101, -83, 83, 101]) plane(x, 0, 4, 520, side);
+for (const z of [-22, 22, -101, -83, 83, 101]) plane(0, z, 520, 4, side);
+
+function building(x, z, w, d, h, color) {
+  box(x, h / 2, z, w, h, d, M(color));
+  box(x, h + .08, z, w * .92, .12, d * .92, M(0x343a40));
+  for (let px = x - w * .3; px <= x + w * .3; px += w * .3) {
+    box(px, h * .53, z - d / 2 - .03, w * .1, h * .17, .04, glass);
+    box(px, h * .53, z + d / 2 + .03, w * .1, h * .17, .04, glass);
+  }
+}
+
+const blocks = [
+  [-150,-150,'old'],[-55,-150,'shop'],[55,-150,'home'],[150,-150,'park'],
+  [-150,-55,'home'],[-55,-55,'center'],[55,-55,'center'],[150,-55,'industrial'],
+  [-150,55,'home'],[-55,55,'center'],[55,55,'center'],[150,55,'home'],
+  [-150,150,'park'],[-55,150,'shop'],[55,150,'home'],[150,150,'old']
+];
+
+for (const [x, z, type] of blocks) {
+  if (type === 'park') {
+    plane(x, z, 65, 65, M(0x4d714a));
+    for (let i = 0; i < 13; i++) {
+      const tx = x + (Math.random() - .5) * 55;
+      const tz = z + (Math.random() - .5) * 55;
+      box(tx, 2, tz, 1.2, 4, 1.2, M(0x594334));
+      box(tx, 5.5, tz, 5, 5, 5, M(0x315c38));
+    }
+  } else if (type === 'industrial') {
+    for (let i = -1; i <= 1; i++) building(x + i * 18, z, 30, 27, 14, 0x626a70);
+  } else {
+    for (let i = -1; i <= 1; i++) {
+      building(x + i * 19, z - 7, 15, 16, type === 'center' ? 20 : 13,
+        [0x896a5d, 0x707a81, 0x7c625b][i + 1]);
+    }
+    for (let i = -1; i <= 1; i++) {
+      building(x + i * 19, z + 19, 15, 13, type === 'shop' ? 12 : 11, 0x806c61);
+    }
+  }
+}
+
+function marker(x, z, color, label) {
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(5.2, 6.2, 48),
+    new THREE.MeshBasicMaterial({ color, transparent: true, opacity: .85, side: THREE.DoubleSide })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.set(x, .12, z);
+  scene.add(ring);
+  box(x, .5, z, .7, 1, .7, M(color));
+  const canvas = document.createElement('canvas');
+  canvas.width = 300; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 28px Arial'; ctx.textAlign = 'center';
+  ctx.fillText(label, 150, 40);
+  const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), transparent: true }));
+  sprite.scale.set(18, 4, 1);
+  sprite.position.set(x, 10, z);
+  scene.add(sprite);
+}
+
+box(-38, 5, -38, 28, 10, 24, M(0x46515c));
+marker(-38, -38, 0xff8a00, 'DEALER');
+box(38, 4, -38, 25, 8, 22, M(0x58636a));
+marker(38, -38, 0x35b9ff, 'TUNING');
+marker(-38, 0, 0xff8a00, 'RIDEOUT');
+marker(38, 38, 0xff8a00, 'EVENT');
+marker(-92, 92, 0xff8a00, 'EVENT');
+
+for (let i = -230; i <= 230; i += 46) {
+  box(-28, 4, i, .35, 8, .35, dark);
+  box(28, 4, i, .35, 8, .35, dark);
+  box(i, 4, -28, .35, 8, .35, dark);
+  box(i, 4, 28, .35, 8, .35, dark);
+}
+
+const scooter = new THREE.Group();
+scene.add(scooter);
+const body = new THREE.Mesh(new THREE.BoxGeometry(1.4, .35, 3), M(0x171a1d));
+body.position.y = 1.05; scooter.add(body);
+const deck = new THREE.Mesh(new THREE.BoxGeometry(1, .18, 2.1), M(0x31363b));
+deck.position.y = .78; scooter.add(deck);
+for (const z of [-1.15, 1.15]) {
+  const wheel = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, .22, 24), dark);
+  wheel.rotation.z = Math.PI / 2;
+  wheel.position.set(0, .48, z);
+  scooter.add(wheel);
+}
+const stem = new THREE.Mesh(new THREE.CylinderGeometry(.09, .09, 1.8, 12), dark);
+stem.position.set(0, 1.8, -.8); stem.rotation.x = -.15; scooter.add(stem);
+const handlebar = new THREE.Mesh(new THREE.BoxGeometry(1.3, .12, .12), dark);
+handlebar.position.set(0, 2.65, -.8); scooter.add(handlebar);
+
+let speed = 0, heading = 0, yaw = 0, distance = 16;
+const keys = {};
+addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+let dragging = false, lastX = 0;
+addEventListener('mousedown', e => { dragging = true; lastX = e.clientX; });
+addEventListener('mouseup', () => dragging = false);
+addEventListener('mousemove', e => {
+  if (dragging) { yaw -= (e.clientX - lastX) * .006; lastX = e.clientX; }
+});
+addEventListener('wheel', e => {
+  distance = THREE.MathUtils.clamp(distance + e.deltaY * .015, 7, 30);
+}, { passive: true });
+
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), .035);
+  const forward = keys.w || keys.arrowup;
+  const backward = keys.s || keys.arrowdown;
+  const steering = (keys.a || keys.arrowleft ? -1 : 0) + (keys.d || keys.arrowright ? 1 : 0);
+
+  if (forward) speed = Math.min(speed + 18 * dt, 22);
+  else if (backward) speed = Math.max(speed - 26 * dt, -7);
+  else speed *= Math.pow(.05, dt);
+
+  heading -= steering * 1.9 * dt * Math.min(1, Math.abs(speed) / 5);
+  scooter.rotation.y = heading;
+  scooter.position.x = THREE.MathUtils.clamp(scooter.position.x + Math.sin(heading) * speed * dt, -245, 245);
+  scooter.position.z = THREE.MathUtils.clamp(scooter.position.z + Math.cos(heading) * speed * dt, -245, 245);
+
+  const target = scooter.position.clone();
+  target.y = 2.2;
+  camera.position.lerp(new THREE.Vector3(
+    target.x + Math.sin(heading + yaw) * distance,
+    9.5,
+    target.z + Math.cos(heading + yaw) * distance
+  ), .08);
+  camera.lookAt(target);
+  renderer.render(scene, camera);
+}
+animate();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
